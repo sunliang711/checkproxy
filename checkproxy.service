@@ -14,10 +14,10 @@ Description=check proxy
 #ExecStop=
 
 Type=simple
-ExecStart=checkproxy
+ExecStart=/PATH/TO/checkproxy
 #ExecStop=
 
-WorkingDirectory=/TODO
+WorkingDirectory=/PATH/TO/WD
 Restart=always
 #Environment=
 [Install]
