@@ -1,0 +1,18 @@
+# http proxy or socks5 proxy
+proxy=""
+# http GET timeout, unit ms
+timeout=3000
+dest="https://www.google.com"
+# check interval,unit second
+interval=60
+
+[email]
+apiServer=""
+receiver=""
+auth_key=""
+
+[log]
+level="debug"
+logfile=""
+showFullTime=true
+reportCaller=false
