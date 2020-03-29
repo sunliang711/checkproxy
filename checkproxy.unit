@@ -1,0 +1,24 @@
+[Unit]
+Description=check proxy
+#After=network.target
+
+[Service]
+#Type=forking
+#PIDFile=
+#ExecStart=
+#ExecStop=
+
+#Type=oneshot
+#RemainAfterExit=yes
+#ExecStart=
+#ExecStop=
+
+Type=simple
+ExecStart=checkproxy
+#ExecStop=
+
+WorkingDirectory=/TODO
+Restart=always
+#Environment=
+[Install]
+WantedBy=multi-user.target
