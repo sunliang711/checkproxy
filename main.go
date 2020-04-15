@@ -78,11 +78,12 @@ func check(client *http.Client) {
 		logrus.Debugf("client.Get(%s)", dest)
 
 	INNER:
-		for i := 1; i <= viper.GetInt("try"); i++ {
+		for i := 1; i <= viper.GetInt("retry"); i++ {
 			_, err := client.Get(dest)
 			if err != nil {
-				logrus.Debugf("try %d error: %s", i, err.Error())
+				logrus.Debugf("retry %d error: %s", i, err.Error())
 				result = Error
+				time.Sleep(time.Duration(viper.GetInt("retrydelay")) * time.Second)
 				continue INNER
 			} else {
 				result = OK

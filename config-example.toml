@@ -6,8 +6,10 @@ dest="https://www.google.com"
 # check interval,unit second
 interval=60
 
-# try count
-try=3
+# retry count
+retry=3
+# after 'retrydelay' seconds,retry
+retrydelay=3
 
 [email]
 apiServer=""
