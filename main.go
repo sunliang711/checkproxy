@@ -21,10 +21,11 @@ const (
 var (
 	lastStatus = OK
 
-	proxy    string
-	timeout  int
-	dest     string
-	interval int
+	proxy           string
+	proxyNoUserInfo string
+	timeout         int
+	dest            string
+	interval        int
 
 	apiServer string
 	receiver  string
@@ -58,8 +59,8 @@ func main() {
 	proxyURL, err := url.Parse(proxy)
 	if err != nil {
 		logrus.Fatalf("Parse proxy url error: %s", err.Error())
-
 	}
+	proxyNoUserInfo = fmt.Sprintf("%v://%v", proxyURL.Scheme, proxyURL.Host)
 
 	client := &http.Client{
 		Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)},
@@ -72,28 +73,30 @@ func main() {
 }
 
 func check(client *http.Client) {
-	tick := time.Tick(time.Second * time.Duration(interval))
+	var result int
 	for {
+		logrus.Debugf("client.Get(%s)", dest)
+
 	INNER:
-		select {
-		case <-tick:
-			logrus.Debugf("clien.Get(%s)", dest)
-			resp, err := client.Get(dest)
+		for i := 1; i <= viper.GetInt("try"); i++ {
+			_, err := client.Get(dest)
 			if err != nil {
-				logrus.Errorf("Get %s error: %s", dest, err.Error())
-				notify(Error)
+				logrus.Debugf("try %d error: %s", i, err.Error())
+				result = Error
+				continue INNER
+			} else {
+				result = OK
 				break INNER
 			}
-			resp.Body.Close()
-			logrus.Infof("Get %s OK", dest)
-			notify(OK)
-
 		}
+
+		notify(result)
+		time.Sleep(time.Duration(interval) * time.Second)
 	}
 }
 
 func notify(status int) {
-	subject := fmt.Sprintf("Proxy: %s", proxy)
+	subject := fmt.Sprintf("Proxy: %s", proxyNoUserInfo)
 	if status == OK {
 		subject += " work"
 	} else {
