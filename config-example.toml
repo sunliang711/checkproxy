@@ -1,11 +1,15 @@
 # http proxy or socks5 proxy
-proxy=""
+proxies=["",""]
 # http GET timeout, unit ms
 timeout=3000
 dest="https://www.google.com"
 # check interval,unit second
-interval=60
+interval=10
 
+#retry count
+retry=3
+# after 'retrydelay' seconds,retry
+retrydelay=3
 [email]
 apiServer=""
 receiver=""
