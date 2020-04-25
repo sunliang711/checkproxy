@@ -105,7 +105,7 @@ func notify(proxy string, status int) {
 		subject += " [ Not work ] "
 	}
 	subject += proxy
-	logrus.Debugf(subject)
+	logrus.Infof(subject)
 
 	//send mail on when status changs
 	if status != proxiesStatus[proxy] {
