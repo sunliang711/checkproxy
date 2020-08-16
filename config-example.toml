@@ -17,6 +17,6 @@ auth_key=""
 
 [log]
 level="debug"
-logfile=""
+logfile="/tmp/checkproxy.log"
 showFullTime=true
 reportCaller=false
