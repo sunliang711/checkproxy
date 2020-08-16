@@ -1,5 +1,13 @@
+[[proxies]]
+name=""
 # http proxy or socks5 proxy
-proxies=["",""]
+url=""
+
+[[proxies]]
+name=""
+url=""
+
+[basic]
 # http GET timeout, unit ms
 timeout=3000
 dest="https://www.google.com"

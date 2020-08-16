@@ -28,6 +28,11 @@ var (
 	authKey   string
 )
 
+type proxySetting struct {
+	Name string
+	Url  string
+}
+
 func main() {
 	proxiesStatus = make(map[string]int)
 
@@ -36,12 +41,23 @@ func main() {
 		logrus.Fatalf("Init config logger error: %s", err.Error())
 	}
 
-	proxies := viper.GetStringSlice("proxies")
-	timeout = viper.GetInt("timeout")
-	dest = viper.GetString("dest")
-	interval = viper.GetInt("interval")
+	// proxies2 := viper.Get("proxies2")
+	// fmt.Printf("proxies2: %v", proxies2)
+	// for _, pxy := range proxies2.([]interface{}) {
+	// 	fmt.Printf("pxy: name: %v url: %v", pxy["name"], pxy["url"])
+	// }
+	var ps []*proxySetting
+	err = viper.UnmarshalKey("proxies", &ps)
+	if err != nil {
+		logrus.Fatalf("unmarshal proxies error: %v", err)
+	}
 
-	logrus.Infof("proxies: %v", proxies)
+	// proxies := viper.GetStringSlice("proxies")
+	timeout = viper.GetInt("basic.timeout")
+	dest = viper.GetString("basic.dest")
+	interval = viper.GetInt("basic.interval")
+
+	logrus.Infof("proxies: %v", ps)
 	logrus.Infof("timeout: %d ms", timeout)
 	logrus.Infof("dest: %s", dest)
 	logrus.Infof("interval: %d s", interval)
@@ -54,8 +70,8 @@ func main() {
 	logrus.Infof("email.receiver: %s", receiver)
 	logrus.Infof("email.authKey: %s", authKey)
 
-	for _, proxy := range proxies {
-		parsedProxy, err := url.Parse(proxy)
+	for _, proxy := range ps {
+		parsedProxy, err := url.Parse(proxy.Url)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{"proxy": proxy, "err": err.Error()}).Fatalf("parse proxy url")
 		}
@@ -67,24 +83,24 @@ func main() {
 		}
 
 		// init status is OK
-		proxiesStatus[proxy] = OK
+		proxiesStatus[proxy.Url] = OK
 
 		go check(client, proxy)
 	}
 	select {}
 }
 
-func check(client *http.Client, proxy string) {
+func check(client *http.Client, proxy *proxySetting) {
 	var result int
 	for {
 		logrus.Debugf("client.Get(%s)", dest)
 	INNER:
-		for i := 1; i < viper.GetInt("retry"); i++ {
+		for i := 1; i < viper.GetInt("basic.retry"); i++ {
 			_, err := client.Get(dest)
 			if err != nil {
 				logrus.Debugf("retry %d error: %s", i, err.Error())
 				result = Error
-				time.Sleep(time.Duration(viper.GetInt("retrydelay")) * time.Second)
+				time.Sleep(time.Duration(viper.GetInt("basic.retrydelay")) * time.Second)
 				continue INNER
 			} else {
 				result = OK
@@ -97,18 +113,18 @@ func check(client *http.Client, proxy string) {
 	}
 }
 
-func notify(proxy string, status int) {
+func notify(proxy *proxySetting, status int) {
 	var subject string
 	if status == OK {
 		subject += " [ Work ] "
 	} else {
 		subject += " [ Not work ] "
 	}
-	subject += proxy
+	subject += proxy.Name
 	logrus.Infof(subject)
 
 	//send mail on when status changs
-	if status != proxiesStatus[proxy] {
+	if status != proxiesStatus[proxy.Name] {
 		reqBody := struct {
 			To      string `json:"to"`
 			Subject string `json:"subject"`
@@ -134,5 +150,5 @@ func notify(proxy string, status int) {
 		logrus.Info("Email sent")
 
 	}
-	proxiesStatus[proxy] = status
+	proxiesStatus[proxy.Name] = status
 }
