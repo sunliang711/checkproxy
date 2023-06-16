@@ -15,10 +15,10 @@ Description=check proxy
 
 User=eagle
 Type=simple
-ExecStart=/PATH/TO/checkproxy
+ExecStart=EXE
 #ExecStop=
 
-WorkingDirectory=/PATH/TO/WD
+WorkingDirectory=PWD
 Restart=always
 #Environment=
 [Install]
