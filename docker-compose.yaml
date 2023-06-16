@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  checkproxy:
+    build: .
+    # ports:
+    #   - "6070:8080"
+    # environment:
+    #   ALIDDNS_LOG_LEVEL: info
+    volumes:
+      - ./config.toml:/usr/local/bin/config.toml
+
