@@ -9,3 +9,5 @@ services:
     volumes:
       - ./config.toml:/usr/local/bin/config.toml
 
+    restart: always
+
