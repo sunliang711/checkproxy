@@ -9,6 +9,6 @@ FROM alpine
 WORKDIR /usr/local/bin
 
 COPY --from=builder /tmp/myService/checkproxy /usr/local/bin/
-COPY --from=builder /tmp/myService/config.toml /usr/local/bin/
+COPY --from=builder /tmp/myService/config-example.toml /usr/local/bin/config.toml
 
 ENTRYPOINT ["checkproxy"]
